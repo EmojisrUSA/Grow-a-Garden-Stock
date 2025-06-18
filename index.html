@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Grow a Garden Stock</title>
+
+  <!-- PWA: Manifest & Icons -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#4CAF50" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 20px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+    .updated-time {
+      text-align: center;
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    .section { margin-bottom: 30px; }
+    .item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+    }
+    .item:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Grow a Garden Stock</h1>
+  <div class="updated-time" id="updated-time"></div>
+  <div id="gear" class="section"><h2>Gear</h2><div class="items"></div></div>
+  <div id="seeds" class="section"><h2>Seeds</h2><div class="items"></div></div>
+  <div id="egg" class="section"><h2>Eggs</h2><div class="items"></div></div>
+  <div id="honey" class="section"><h2>Honey</h2><div class="items"></div></div>
+  <div id="cosmetics" class="section"><h2>Cosmetics</h2><div class="items"></div></div>
+</div>
+
+<script>
+async function fetchStockData() {
+  try {
+    const res = await fetch('https://growagardenapi.vercel.app/api/stock/GetStock');
+    const data = (await res.json()).Data;
+
+    const categories = ['gear', 'seeds', 'egg', 'honey', 'cosmetics'];
+
+    categories.forEach(cat => {
+      const el = document.querySelector(`#${cat} .items`);
+      el.innerHTML = data[cat].map(item => `
+        <div class="item">
+          <span>${item.name}</span><span>x${item.stock}</span>
+        </div>
+      `).join('');
+    });
+
+    const updated = new Date(data.updatedAt).toLocaleString();
+    document.getElementById('updated-time').textContent = `Last Updated: ${updated}`;
+
+  } catch (err) {
+    console.error('Failed to fetch data', err);
+  }
+}
+
+window.onload = fetchStockData;
+</script>
+
+</body>
+</html>
